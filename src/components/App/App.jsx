@@ -1,6 +1,5 @@
 import { Component } from 'react';
 import { nanoid } from 'nanoid';
-
 import ContactsForm from 'components/ContactsForm';
 import ContactsList from 'components/ContactsList/ContactsList';
 import ContactsItem from 'components/ContactsItem';
@@ -9,23 +8,24 @@ import Notification from 'components/Notification';
 export class App extends Component {
   state = {
     contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459 12 56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+      { id: 'id-1', name: 'Rosie Simpson', number: '098-396-56-58' },
+      { id: 'id-2', name: 'Hermione Kline', number: '050-966-23-50' },
+      { id: 'id-3', name: 'Eden Clements', number: '099-663-10-22' },
+      { id: 'id-4', name: 'Annie Copeland', number: '099-423-66-19' },
     ],
     filter: '',
   };
   createContact = ({ name, number }) => {
     const id = nanoid();
     if (this.checkContactsForComplinance({ name, number })) {
-      return this.notification();
+      return this.notification(name);
     }
 
     this.setState(({ contacts }) => {
       return { name, contacts: [{ name, number, id }, ...contacts] };
     });
   };
+
   deleteContact = id => {
     this.setState(({ contacts }) => {
       return {
@@ -37,8 +37,8 @@ export class App extends Component {
   checkContactsForComplinance = ({ name: newName }) => {
     return this.state.contacts.find(({ name }) => name === newName);
   };
-  notification = () => {
-    alert(`You have already had this contact!`);
+  notification = name => {
+    alert(`You have already had ${name} as contact!`);
   };
   changeFilter = e => {
     this.setState({ filter: e.currentTarget.value });

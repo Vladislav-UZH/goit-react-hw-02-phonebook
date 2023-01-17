@@ -1,59 +1,76 @@
 import { Component } from 'react';
-import { nanoid } from 'nanoid';
-import { Form, Input, Label, SubmitBtn } from './ContactsForm.styled';
+import {
+  Container,
+  Input,
+  Label,
+  SubmitBtn,
+  ErrorNotify,
+} from './ContactsForm.styled';
+import { Formik } from 'formik';
 import PropTypes from 'prop-types';
+import * as Yup from 'yup';
+import 'yup-phone';
+const schema = Yup.object().shape({
+  name: Yup.string('Enter the letters!').required(
+    'You forgot to enter a name!'
+  ),
+  number: Yup.string('Enter a numbers please!')
+    .phone('UA', true, 'Enter UA number format!')
+    .required('You forgot to enter a number!'),
+});
 
 class ContactsForm extends Component {
   static propTypes = {
     createContact: PropTypes.func.isRequired,
   };
-  contactsInputId = nanoid();
-  numberInputId = nanoid();
-  handleSubmit = evt => {
-    evt.preventDefault();
-    const form = evt.currentTarget;
-    const inputContactName = form.elements.name;
-    const inputContactNumber = form.elements.number;
-    const name = inputContactName.value.trim();
-    const number = inputContactNumber.value.trim();
-
+  handleSubmit = (values, { resetForm }) => {
+    const { name, number } = values;
     const { createContact } = this.props;
-    createContact({ name, number });
-
-    form.reset();
+    const contactData = { name, number };
+    resetForm();
+    return createContact(contactData);
   };
 
   render() {
     return (
-      <Form onSubmit={this.handleSubmit}>
-        <Label htmlFor={this.contactsInputId}>
-          Name
-          <Input
-            id={this.contactsInputId}
-            type="text"
-            name="name"
-            placeholder="Enter name"
-            pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-            title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-            required
-          />
-        </Label>
+      <Formik
+        initialValues={{
+          name: '',
+          number: '',
+        }}
+        validationSchema={schema}
+        onSubmit={this.handleSubmit}
+      >
+        <Container autoComplete="off">
+          <div>
+            <Label>
+              Name
+              <Input
+                type="text"
+                name="name"
+                placeholder="Enter name"
+                title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+              />
+            </Label>
 
-        <Label htmlFor={this.numberInputId}>
-          Number{' '}
-          <Input
-            id={this.numberInputId}
-            type="tel"
-            name="number"
-            placeholder="Enter number"
-            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-            title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-            required
-          />
-        </Label>
+            <ErrorNotify name="name" component="div" />
+          </div>
+          <div>
+            <Label>
+              Number
+              <Input
+                type="tel"
+                name="number"
+                placeholder="Enter number"
+                title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+              />
+            </Label>
 
-        <SubmitBtn type="submit">Add</SubmitBtn>
-      </Form>
+            <ErrorNotify name="number" component="div" />
+          </div>
+          <SubmitBtn type="submit">Add</SubmitBtn>
+        </Container>
+      </Formik>
     );
   }
 }

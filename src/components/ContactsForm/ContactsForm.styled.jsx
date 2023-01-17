@@ -1,11 +1,17 @@
 import styled from '@emotion/styled';
+import { Field, Form, ErrorMessage } from 'formik';
 
-const Form = styled.form`
+const Container = styled(Form)`
   display: flex;
   align-items: flex-end;
   margin: 10px 0;
   gap: 15px;
 `;
+const ErrorNotify = styled(ErrorMessage)`
+  font-style: italic;
+  color: #cc2c04;
+`;
+
 const Label = styled.label`
   display: flex;
   flex-direction: column;
@@ -13,7 +19,7 @@ const Label = styled.label`
   font-weight: 500;
   color: #e2580a;
 `;
-const Input = styled.input`
+const Input = styled(Field)`
   padding: 5px 5px 5px 12px;
   border: none;
   border-radius: 10px;
@@ -40,4 +46,4 @@ const SubmitBtn = styled.button`
   border: none;
   background-color: #e2580a;
 `;
-export { Input, Form, Label, SubmitBtn };
+export { Input, Container, Label, SubmitBtn, ErrorNotify };
