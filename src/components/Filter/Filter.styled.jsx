@@ -1,7 +1,4 @@
 import styled from '@emotion/styled';
-const baseInputStyle = `
-    
-`;
 const Form = styled.form`
   display: flex;
   align-items: flex-end;
