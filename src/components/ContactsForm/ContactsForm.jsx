@@ -1,4 +1,5 @@
 import { Component } from 'react';
+// Styles
 import {
   Container,
   Input,
@@ -6,19 +7,24 @@ import {
   SubmitBtn,
   ErrorNotify,
 } from './ContactsForm.styled';
+// Formik
 import { Formik } from 'formik';
+// PropTypes
 import PropTypes from 'prop-types';
+// Yup
 import * as Yup from 'yup';
 import 'yup-phone';
+
+// Validation Schema
 const schema = Yup.object().shape({
   name: Yup.string('Enter the letters!').required(
     'You forgot to enter a name!'
   ),
   number: Yup.string('Enter a numbers please!')
-    .phone('UA', true, 'Enter UA number format!')
-    .required('You forgot to enter a number!'),
+    .required('You forgot to enter a number!')
+    .phone('UA', true, 'Enter UA number format!'),
 });
-
+// Form
 class ContactsForm extends Component {
   static propTypes = {
     createContact: PropTypes.func.isRequired,
