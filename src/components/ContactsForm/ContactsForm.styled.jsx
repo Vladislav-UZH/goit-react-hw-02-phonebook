@@ -4,10 +4,11 @@ import { Field, Form, ErrorMessage } from 'formik';
 const Container = styled(Form)`
   display: flex;
   align-items: flex-end;
-  margin: 10px 0;
+  margin: 10px 0 25px 0;
   gap: 15px;
 `;
 const ErrorNotify = styled(ErrorMessage)`
+  position: absolute;
   font-style: italic;
   color: #cc2c04;
 `;
