@@ -1,60 +1,57 @@
+import { Button } from 'components/Button/Button';
+import { ImageGallery } from 'components/ImageGallery/ImageGallery';
+import { Loader } from 'components/Loader/Loader';
+import { SearchBar } from 'components/SearchBar/SearchBar';
 import { Component } from 'react';
+import { fetchImages } from 'service/fetchImages';
 // Components
-import ContactsForm from 'components/ContactsForm';
-import ContactsList from 'components/ContactsList/ContactsList';
-import ContactsItem from 'components/ContactsItem';
-import Filter from 'components/Filter';
-import Notification from 'components/Notification';
-// nanoid
-import { nanoid } from 'nanoid';
+
+// import Notification from 'components/Notification';
 //___APP___
 export class App extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '098-396-56-58' },
-      { id: 'id-2', name: 'Hermione Kline', number: '050-966-23-50' },
-      { id: 'id-3', name: 'Eden Clements', number: '099-663-10-22' },
-      { id: 'id-4', name: 'Annie Copeland', number: '099-423-66-19' },
-    ],
-    filter: '',
+    query: '',
+    images: [],
+    page: 1,
+    isLoading: false,
+    totalImgs: 0,
   };
-  createContact = ({ name, number }) => {
-    const id = nanoid();
-    if (this.checkContactsForComplinance({ name, number })) {
-      return this.notification(name);
+  componentDidUpdate(_, prevState) {
+    const { query, page } = this.state;
+    if (prevState.query !== query || prevState.page !== page) {
+      this.handleFetchImages(query, page);
     }
-
-    this.setState(({ contacts }) => {
-      return { name, contacts: [{ name, number, id }, ...contacts] };
-    });
+  }
+  handleFetchImages = async (query, page) => {
+    try {
+      const resp = await fetchImages(query, page);
+      this.setState(({ images }) => ({
+        images: page === 1 ? [...resp.hits] : [...images, ...resp.hits],
+        totalImgs: resp.totalHits,
+      }));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.setState({ isLoading: false });
+    }
   };
-
-  deleteContact = id => {
-    this.setState(({ contacts }) => {
-      return {
-        contacts: contacts.filter(contact => contact.id !== id),
-      };
-    });
-    console.log('delete');
+  handleLoadMore = () => {
+    this.setState(({ page }) => ({ page: page + 1, isLoading: true }));
   };
-  checkContactsForComplinance = ({ name: newName }) => {
-    return this.state.contacts.find(({ name }) => name === newName);
+  handleSubmit = query => {
+    this.setState({ query, isLoading: true });
   };
-  notification = name => {
-    alert(`You have already had ${name} as contact!`);
-  };
-  changeFilter = e => {
-    this.setState({ filter: e.currentTarget.value });
-  };
-  getFiltredContacts = () => {
-    const { contacts, filter } = this.state;
-    const normalizedFilter = filter.toLowerCase();
-    return contacts.filter(({ name }) =>
-      name.toLowerCase().includes(normalizedFilter)
+  renderButtonOrLoader = () => {
+    return this.state.isLoading ? (
+      <Loader />
+    ) : (
+      this.state.images.length !== 0 &&
+        this.state.images.length < this.state.totalImgs && (
+          <Button onClick={this.handleLoadMore} />
+        )
     );
   };
   render() {
-    const { filter } = this.state;
     return (
       <div
         style={{
@@ -67,29 +64,9 @@ export class App extends Component {
           color: '#DBD7D7',
         }}
       >
-        <div
-          style={{
-            borderRadius: 10,
-            padding: 30,
-            backgroundColor: '#32343B',
-          }}
-        >
-          <h1>Phonebook</h1>
-          <ContactsForm createContact={this.createContact} />
-
-          <h2>Contacts</h2>
-          <Filter value={filter} onChange={this.changeFilter} />
-          <ContactsList>
-            {!this.getFiltredContacts().length ? (
-              <Notification message="No contacts with the entered name!" />
-            ) : (
-              <ContactsItem
-                deleteContact={this.deleteContact}
-                contacts={this.getFiltredContacts()}
-              />
-            )}
-          </ContactsList>
-        </div>
+        <SearchBar onSubmit={this.handleSubmit} />
+        <ImageGallery images={this.state.images} />
+        {this.renderButtonOrLoader()}
       </div>
     );
   }
