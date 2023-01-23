@@ -55,13 +55,13 @@ export class App extends Component {
     return (
       <div
         style={{
-          padding: 20,
+          // padding: 20,
           display: 'flex',
           justifyContent: 'center',
           flexDirection: 'column',
           alignItems: 'center',
           backgroundColor: '#22232B',
-          color: '#DBD7D7',
+          // color: '#DBD7D7',
         }}
       >
         <SearchBar onSubmit={this.handleSubmit} />
